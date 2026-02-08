@@ -10,22 +10,24 @@ function gm(price: number, cost: number): number {
   return ((price - cost) / price) * 100
 }
 
-export function computeFromOPD(item: Item, opdTarget: number, skgDiscountPct: number): PricingResult {
+/**
+ * Business rule (ตามที่แจ้งล่าสุด):
+ * - IPD = OPD * 1.2
+ * - SKG OPD = OPD
+ * - SKG IPD = IPD
+ * - Foreigner = IPD * 1.3 (เพิ่ม 30% จากราคา IPD)
+ *
+ * หมายเหตุ: opd_foreigner_price และ ipd_foreigner_price จะตั้งเท่ากัน = IPD*1.3
+ */
+export function computeFromManualPrices(item: Item, opd_price: number, ipd_price: number, skgDiscountPct: number): PricingResult {
   const cost = n(item.cost) ?? 0
 
-  const ipdFactor = n(item.ipd_factor) ?? (n(item.ipd_price) && n(item.opd_price) ? (n(item.ipd_price)! / n(item.opd_price)!) : 1)
-  const skgOpdFactor = n(item.skg_opd_factor) ?? 1
-  const skgIpdFactor = n(item.skg_ipd_factor) ?? 1
-  const uplift = n(item.foreigner_uplift_pct) ?? 0
+  const skg_opd_price = opd_price
+  const skg_ipd_price = ipd_price
 
-  const opd_price = opdTarget
-  const ipd_price = opd_price * ipdFactor
-
-  const skg_opd_price = opd_price * skgOpdFactor
-  const skg_ipd_price = ipd_price * skgIpdFactor
-
-  const opd_foreigner_price = opd_price * (1 + uplift / 100)
-  const ipd_foreigner_price = ipd_price * (1 + uplift / 100)
+  const foreigner = ipd_price * 1.3
+  const opd_foreigner_price = foreigner
+  const ipd_foreigner_price = foreigner
 
   const skg_opd_discounted = skg_opd_price * (1 - skgDiscountPct / 100)
   const skg_ipd_discounted = skg_ipd_price * (1 - skgDiscountPct / 100)
@@ -59,9 +61,17 @@ export function computeFromOPD(item: Item, opdTarget: number, skgDiscountPct: nu
   }
 }
 
-export function computeFromGM(item: Item, gmTargetPct: number, skgDiscountPct: number): PricingResult {
+export function computeFromOPD(item: Item, opdTarget: number, skgDiscountPct: number): PricingResult {
+  const opd_price = opdTarget
+  const ipd_price = opd_price * 1.2
+  return computeFromManualPrices(item, opd_price, ipd_price, skgDiscountPct)
+}
+
+export function computeFromGM(item: Item, gmTarget: number, skgDiscountPct: number): PricingResult {
   const cost = n(item.cost) ?? 0
-  const denom = 1 - gmTargetPct / 100
-  const opdTarget = denom <= 0 ? 0 : cost / denom
-  return computeFromOPD(item, opdTarget, skgDiscountPct)
+  const target = Math.max(0, Math.min(99.99, gmTarget))
+  // gm = (p - c) / p => p = c / (1 - gm)
+  const opd_price = (1 - target / 100) <= 0 ? 0 : (cost / (1 - target / 100))
+  const ipd_price = opd_price * 1.2
+  return computeFromManualPrices(item, opd_price, ipd_price, skgDiscountPct)
 }

@@ -33,6 +33,10 @@ export function App() {
   const [subSummaryOpen, setSubSummaryOpen] = useState(false)
   const [subRows, setSubRows] = useState<SubclassSummaryRow[]>([])
 
+  const dosageOptions = useMemo(() => Array.from(new Set(items.map(i => String(i.dosage_form || '').trim()).filter(Boolean))).sort(), [items])
+  const majorClassOptions = useMemo(() => Array.from(new Set(items.map(i => String(i.major_class || '').trim()).filter(Boolean))).sort(), [items])
+  const subClassOptions = useMemo(() => Array.from(new Set(items.map(i => String(i.sub_class || '').trim()).filter(Boolean))).sort(), [items])
+
   const defaultIpdFactor = useMemo(() => {
     const v = Number(config['default_ipd_factor'])
     return Number.isFinite(v) ? v : 1.6
@@ -62,6 +66,13 @@ export function App() {
   }
 
   useEffect(() => { loadAll() }, []) // initial
+
+  // Auto filter while typing (debounced)
+  useEffect(() => {
+    const t = setTimeout(() => { loadAll() }, 350)
+    return () => clearTimeout(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [q])
 
   const selectedItems = useMemo(() => {
     const map = new Map(items.map(i => [i.item_code, i]))
@@ -207,7 +218,7 @@ export function App() {
               style={{ width: 520 }}
               value={q}
               onChange={e => setQ(e.target.value)}
-              onSearch={() => loadAll()}
+              onSearch={() => {}}
             />
             <Button onClick={() => loadAll()} loading={loading}>Refresh</Button>
             <Input
@@ -240,10 +251,13 @@ export function App() {
             open={addOpen}
             defaultIpdFactor={defaultIpdFactor}
             defaultUpliftPct={defaultUpliftPct}
+            defaultUpdatedBy={updatedBy}
+            dosageOptions={dosageOptions}
+            majorClassOptions={majorClassOptions}
+            subClassOptions={subClassOptions}
             onClose={() => setAddOpen(false)}
             onCreate={async (item) => {
-              if (!updatedBy.trim()) { message.warning('กรุณากรอก Updated By ก่อนเพิ่มรายการ'); return }
-              await createItem(item, updatedBy.trim())
+              await createItem(item, updatedByFromModal)
               message.success('เพิ่มรายการสำเร็จ')
               setAddOpen(false)
               await loadAll()
