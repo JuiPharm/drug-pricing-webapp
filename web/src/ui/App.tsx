@@ -262,12 +262,22 @@ export function App() {
             majorClassOptions={[...MAJOR_CLASS_OPTIONS]}
             subClassOptions={[...SUB_CLASS_OPTIONS]}
             onClose={() => setAddOpen(false)}
-            onCreate={async (item) => {
-              await createItem(item, updatedByFromModal)
-              message.success('เพิ่มรายการสำเร็จ')
-              setAddOpen(false)
-              await loadAll()
-            }}
+            onCreate={async (item, updatedByFromModal) => {
+          await createItem(item, updatedByFromModal)
+          message.success('เพิ่มรายการสำเร็จ')
+          if (!updatedBy.trim()) setUpdatedBy(updatedByFromModal)
+
+          // Show new item at top immediately (optimistic UI)
+          setItems((prev) => {
+            const now = new Date().toISOString()
+            const enriched: any = { ...item, updated_by: updatedByFromModal, updated_at: now }
+            const filtered = (prev || []).filter(p => p.item_code !== item.item_code)
+            return [enriched, ...filtered]
+          })
+
+          setAddOpen(false)
+          await loadAll()
+}}
           />
 
           <FactorsDrawer
