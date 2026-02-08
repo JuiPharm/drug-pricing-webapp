@@ -13,6 +13,11 @@ import { FactorsDrawer, FactorOverride } from './components/FactorsDrawer'
 import { SummaryTable } from './components/SummaryTable'
 import { SubclassSummary } from './components/SubclassSummary'
 
+const DOSAGE_FORM_OPTIONS = ["TUB", "VIA", "TIN", "BOX", "BOT", "PCS", "GAL", "TAB", "CAP", "PCK", "AMP", "SYR", "SET", "BAG", "ML", "SAC", "PAT", "UNT", "GM", "PAD", "CRT", "LT"] as const
+const MAJOR_CLASS_OPTIONS = ["40.Dermatological & Personal Care", "18.Antidotes, Detoxifying Agents & Drugs Used in Substance Dependence", "13.Nutrition", "31.Health Supplements & Food", "14.Eye", "21.Other Therapeutic Products", "19.Intravenous & Other Sterile Solutions", "20.Radiographic & Diagnostic Agents", "30.Vitamins & Minerals", "09.Oncology", "04.Central Nervous System", "02.Cardiovascular & Hematopoietic System", "03.Respiratory System", "08.Anti-Infectives (Systemic)", "16.Dermatological Therapy", "17.Anaesthetics, Surgical Preparations & Wound Care", "05.Musculo-Skeletal System", "11.Endocrine & Metabolic System", "10.Genito-Urinary System", "01.Gastrointestinal & Hepatobiliary System", "15.Ear & Mouth / Throat", "12.Allergy & Immune System", "06.Hormones", "07.Contraceptive Agents"] as const
+const SUB_CLASS_OPTIONS = ["c.Personal Care", "a.Antidotes & Detoxifying Agents", "b.Enteral/Nutritional Products", "c.Other Complementary Health Products", "a.Emollients, Cleansers & Skin Protectives", "i.Other Eye Preparations", "21.Other Therapeutic Products", "19.Intravenous & Other Sterile Solutions", "20.Radiographic & Diagnostic Agents", "g.Vitamins & Minerals (Paediatric)", "c.Parenteral Nutritional Products", "e.Vitamins &/or Minerals", "a.Infant Nutritional Products", "d.Targeted Cancer Therapy", "l.Nonsteroidal Anti-Inflammatory Drugs (NSAIDs)", "k.Analgesics (Non-Opioid) & Antipyretics", "h.Diuretics", "c.Cough & Cold Preparations", "p.Antivirals", "c.Topical Antivirals", "f.Acne Treatment Preparations", "a.Cardiac Drugs", "a.Anaesthetics - Local & General", "d.Nasal Decongestants & Other Nasal Preparations", "c.Antidepressants", "q.Anthelmintics", "f.Other Drugs Acting on Musculo-Skeletal System", "f.Agents Affecting Bone Metabolism", "e.Drugs for Bladder & Prostate Disorders", "a.Antacids, Antireflux Agents & Antiulcerants", "b.Hyperuricemia & Gout Preparations", "b.Antidiabetic Agents", "b.Hypnotics & Sedatives", "n.Anticoagulants, Antiplatelets & Fibrinolytics (Thrombolytics)", "c.Antispasmodics", "g.Neurodegenerative Disease Drugs", "a.Aminoglycosides", "a.Eye Anti-Infectives & Antiseptics", "b.Antiasthmatic & COPD Preparations", "e.Calcium Antagonists", "d.Beta-Blockers", "f.Angiotensin II Antagonists", "b.Topical Antifungals & Antiparasites", "c.Penicillins", "n.Antifungals", "b.GIT Regulators, Antiflatulents & Anti-Inflammatories", "f.Digestives", "e.Preparations for Oral Ulceration & Inflammation", "b.Cancer Hormone Therapy", "g.Ophthalmic Decongestants, Anesthetics, Anti-Inflammatories", "b.Vaccines, Antisera & Immunologicals", "d.Antipsychotics", "f.Other CNS Drugs & Agents for ADHD", "r.Antimalarials", "c.Vitamin C", "l.Dyslipidaemic Agents", "d.Mydriatic Drugs", "a.Cytotoxic Chemotherapy", "c.Immunosuppressants", "f.Macrolides", "d.Other Beta-Lactams", "c.Muscle Relaxants", "a.Disease-Modifying Anti-Rheumatic Drugs (DMARDs)", "f.Vitamins & Minerals (Geriatric)", "h.Antiparkinsonian Drugs", "k.Other Dermatologicals", "i.Antivertigo Drugs", "e.Topical Corticosteroids", "d.Topical Anti-Infectives with Corticosteroids", "j.Other Gastrointestinal Drugs", "a.Antihistamines & Antiallergics", "e.Laxatives, Purgatives", "h.Anorectal Preparations", "a.Ear Anti-Infectives & Antiseptics", "f.Antiglaucoma Preparations", "e.Trophic Hormones & Related Synthetic Drugs", "a.Vitamins A, D & E", "h.Psoriasis, Seborrhea & Ichthyosis Preparations", "d.Calcium/with Vitamins", "c.ACE Inhibitors/Direct Renin Inhibitors", "e.Miotic Drugs", "e.Anticonvulsants", "c.Drugs Acting on the Uterus", "h.Ophthalmic Lubricants", "b.Cephalosporins", "a.Oral Contraceptives", "g.Cholagogues, Cholelitholytics & Hepatic Protectors", "g.Quinolones", "b.Neuromuscular Blocking Agents", "a.Topical Antibiotics", "k.Other Antibiotics", "a.Anxiolytics", "b.Oestrogens, Progesterones & Related Synthetic Drugs", "j.Antibacterial Combinations", "i.Sulphonamides", "m.Antileprotics", "r.Haematopoietic Agents", "a.Insulin Preparations", "i.Antidiuretics", "d.Corticosteroid Hormones", "c.Eye Corticosteroids", "b.Eye Antiseptics with Corticosteroids", "d.Antidiarrheals", "d.Other Ear Preparations", "i.Antiemetics", "h.Tetracyclines", "n.Antimigraine Preparations", "m.Haemostatics", "k.Vasoconstrictors", "b.Urinary Antiseptics", "g.Other Agents Affecting Metabolism", "l.Anti-TB Agents", "c.Other Contraceptives", "j.Analgesics (Opioid)", "h.Vitamins & Minerals (Pre & Post Natal) / Antianemics", "j.Peripheral Vasodilators & Cerebral Activators", "m.Drugs for Neuropathic Pain", "j.Skin Antiseptics & Disinfectants", "p.Nootropics & Neurotonics/Neurotrophics", "s.Other Cardiovascular Drugs", "c.Surgical Dressings & Wound Care", "c.Cancer Immunotherapy", "b.Anti-Anginal Drugs", "b.Supplements & Adjuvant Therapy", "c.Thyroid Hormones", "e.Supportive Care Therapy", "d.Anti-Inflammatory Enzymes", "d.Antithyroid Agents", "g.Other Antihypertensives", "s.Antiamoebics", "a.Preparations for Vaginal Conditions", "e.Neuromuscular Disorder Drugs", "b.Drugs Used in Substance Dependence", "e.Anti-Obesity Agents", "g.Topical Antihistamines/Antipruritics", "p.Phlebitis & Varicose Preparations", "d.Electrolytes", "f.Other Drugs Acting on the Genito-Urinary System", "i.Warts & Calluses Preparations", "d.Drugs for Erectile Dysfunction & Ejaculatory Disorders", "a.Androgens & Related Synthetic Drugs", "b.Vitamin B-Complex / with C"] as const
+
+
 const { Header, Content } = Layout
 const { Title } = Typography
 
@@ -29,14 +34,9 @@ export function App() {
   const [addOpen, setAddOpen] = useState(false)
   const [factorsOpen, setFactorsOpen] = useState(false)
   const [factorOverrides, setFactorOverrides] = useState<Record<string, FactorOverride>>({})
-  const [priceOverrides, setPriceOverrides] = useState<Record<string, { opd_price?: number; ipd_price?: number }>>({})
   const [summaryOpen, setSummaryOpen] = useState(false)
   const [subSummaryOpen, setSubSummaryOpen] = useState(false)
   const [subRows, setSubRows] = useState<SubclassSummaryRow[]>([])
-
-  const dosageOptions = useMemo(() => Array.from(new Set(items.map(i => String(i.dosage_form || '').trim()).filter(Boolean))).sort(), [items])
-  const majorClassOptions = useMemo(() => Array.from(new Set(items.map(i => String(i.major_class || '').trim()).filter(Boolean))).sort(), [items])
-  const subClassOptions = useMemo(() => Array.from(new Set(items.map(i => String(i.sub_class || '').trim()).filter(Boolean))).sort(), [items])
 
   const defaultIpdFactor = useMemo(() => {
     const v = Number(config['default_ipd_factor'])
@@ -58,7 +58,12 @@ export function App() {
     try {
       const [cfg, data] = await Promise.all([fetchConfig(), fetchItems(q)])
       setConfig(cfg || {})
-      setItems(data)
+      const sorted = [...(data || [])].sort((a, b) => {
+        const ta = a.updated_at ? Date.parse(a.updated_at) : 0
+        const tb = b.updated_at ? Date.parse(b.updated_at) : 0
+        return tb - ta
+      })
+      setItems(sorted)
     } catch (e: any) {
       message.error(e.message || 'Load failed')
     } finally {
@@ -184,16 +189,6 @@ export function App() {
         setOpdTarget={setOpdTarget}
         computed={computed}
         selectedItems={effectiveSelectedItems}
-
-onEditPrice={(code, field, value) => {
-  setPriceOverrides((prev: Record<string, { opd_price?: number; ipd_price?: number }>) => {
-    const cur = prev[code] || {}
-    if (field === 'opd_price') {
-      return { ...prev, [code]: { ...cur, opd_price: value, ipd_price: value * 1.2 } }
-    }
-    return { ...prev, [code]: { ...cur, ipd_price: value } }
-  })
-}}
       />
     )},
     { key: 'gm', label: 'ตั้งราคาจาก Gross Margin OPD', children: (
@@ -204,16 +199,6 @@ onEditPrice={(code, field, value) => {
         setGmTarget={setGmTarget}
         computed={computed}
         selectedItems={effectiveSelectedItems}
-
-onEditPrice={(code, field, value) => {
-  setPriceOverrides((prev: Record<string, { opd_price?: number; ipd_price?: number }>) => {
-    const cur = prev[code] || {}
-    if (field === 'opd_price') {
-      return { ...prev, [code]: { ...cur, opd_price: value, ipd_price: value * 1.2 } }
-    }
-    return { ...prev, [code]: { ...cur, ipd_price: value } }
-  })
-}}
       />
     )},
   ]
@@ -273,14 +258,13 @@ onEditPrice={(code, field, value) => {
             defaultIpdFactor={defaultIpdFactor}
             defaultUpliftPct={defaultUpliftPct}
             defaultUpdatedBy={updatedBy}
-            dosageOptions={dosageOptions}
-            majorClassOptions={majorClassOptions}
-            subClassOptions={subClassOptions}
+            dosageOptions={[...DOSAGE_FORM_OPTIONS]}
+            majorClassOptions={[...MAJOR_CLASS_OPTIONS]}
+            subClassOptions={[...SUB_CLASS_OPTIONS]}
             onClose={() => setAddOpen(false)}
-            onCreate={async (item, updatedByFromModal) => {
+            onCreate={async (item) => {
               await createItem(item, updatedByFromModal)
               message.success('เพิ่มรายการสำเร็จ')
-              if (!updatedBy.trim()) setUpdatedBy(updatedByFromModal)
               setAddOpen(false)
               await loadAll()
             }}
@@ -291,7 +275,7 @@ onEditPrice={(code, field, value) => {
             onClose={() => setFactorsOpen(false)}
             items={effectiveSelectedItems}
             overrides={factorOverrides}
-            onChange={(code, next) => setFactorOverrides((prev: Record<string, FactorOverride>) => ({ ...prev, [code]: next }))}
+            onChange={(code, next) => setFactorOverrides(prev => ({ ...prev, [code]: next }))}
           />
 
           <Drawer

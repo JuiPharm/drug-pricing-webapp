@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react'
-import { Modal, Form, Input, InputNumber, Divider, Select } from 'antd'
+import React, { useEffect, useState } from 'react'
+import { Modal, Form, Input, InputNumber, Divider, Select, message } from 'antd'
 import { Item } from '../../types'
 
 type Props = {
@@ -26,6 +26,7 @@ export function AddItemModal({
   subClassOptions,
 }: Props) {
   const [form] = Form.useForm<any>()
+  const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
     if (open) {
@@ -45,28 +46,42 @@ export function AddItemModal({
       title="เพิ่มรายการใหม่"
       okText="Submit"
       cancelText="Cancel"
-      onCancel={onClose}
+      confirmLoading={submitting}
+      onCancel={() => {
+        if (submitting) return
+        onClose()
+      }}
       onOk={async () => {
-        const v = await form.validateFields()
+        if (submitting) return
+        setSubmitting(true)
+        const hide = message.loading('กำลังบันทึกรายการใหม่...', 0)
+        try {
+          const v = await form.validateFields()
 
-        const updatedBy = String(v.updated_by || '').trim()
-        const payload: Item = {
-          item_code: String(v.item_code).trim(),
-          generic_name: String(v.generic_name || '').trim(),
-          full_name: String(v.full_name || '').trim(),
-          dosage_form: String(v.dosage_form || '').trim(),
-          major_class: String(v.major_class || '').trim(),
-          sub_class: String(v.sub_class || '').trim(),
-          cost: Number(v.cost),
+          const updatedBy = String(v.updated_by || '').trim()
+          const payload: Item = {
+            item_code: String(v.item_code).trim(),
+            generic_name: String(v.generic_name || '').trim(),
+            full_name: String(v.full_name || '').trim(),
+            dosage_form: String(v.dosage_form || '').trim(),
+            major_class: String(v.major_class || '').trim(),
+            sub_class: String(v.sub_class || '').trim(),
+            cost: Number(v.cost),
 
-          ipd_factor: Number(v.ipd_factor),
-          foreigner_uplift_pct: Number(v.foreigner_uplift_pct),
-          skg_opd_factor: Number(v.skg_opd_factor),
-          skg_ipd_factor: Number(v.skg_ipd_factor),
-        } as any
+            ipd_factor: Number(v.ipd_factor),
+            foreigner_uplift_pct: Number(v.foreigner_uplift_pct),
+            skg_opd_factor: Number(v.skg_opd_factor),
+            skg_ipd_factor: Number(v.skg_ipd_factor),
+          } as any
 
-        await onCreate(payload, updatedBy)
-        form.resetFields()
+          await onCreate(payload, updatedBy)
+          form.resetFields()
+        } catch (e: any) {
+          message.error(e?.message || 'บันทึกไม่สำเร็จ')
+        } finally {
+          hide()
+          setSubmitting(false)
+        }
       }}
     >
       <Form layout="vertical" form={form}>
