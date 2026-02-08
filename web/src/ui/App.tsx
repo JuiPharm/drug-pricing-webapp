@@ -185,7 +185,7 @@ export function App() {
         selectedItems={effectiveSelectedItems}
 
 onEditPrice={(code, field, value) => {
-  setPriceOverrides(prev => {
+  setPriceOverrides((prev: Record<string, { opd_price?: number; ipd_price?: number }>) => {
     const cur = prev[code] || {}
     if (field === 'opd_price') {
       return { ...prev, [code]: { ...cur, opd_price: value, ipd_price: value * 1.2 } }
@@ -205,7 +205,7 @@ onEditPrice={(code, field, value) => {
         selectedItems={effectiveSelectedItems}
 
 onEditPrice={(code, field, value) => {
-  setPriceOverrides(prev => {
+  setPriceOverrides((prev: Record<string, { opd_price?: number; ipd_price?: number }>) => {
     const cur = prev[code] || {}
     if (field === 'opd_price') {
       return { ...prev, [code]: { ...cur, opd_price: value, ipd_price: value * 1.2 } }
@@ -290,7 +290,7 @@ onEditPrice={(code, field, value) => {
             onClose={() => setFactorsOpen(false)}
             items={effectiveSelectedItems}
             overrides={factorOverrides}
-            onChange={(code, next) => setFactorOverrides(prev => ({ ...prev, [code]: next }))}
+            onChange={(code, next) => setFactorOverrides((prev: Record<string, FactorOverride>) => ({ ...prev, [code]: next }))}
           />
 
           <Drawer

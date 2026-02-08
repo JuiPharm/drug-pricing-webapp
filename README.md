@@ -117,3 +117,9 @@ Repo → Settings → Secrets and variables → Actions → New repository secre
 - ในหน้าเว็บมีช่อง `Updated By` (ชื่อผู้ใช้งาน)
 - ต้องกรอกก่อน: เพิ่มรายการ / บันทึกราคา
 - ค่านี้จะถูกส่งไป API และบันทึกลงคอลัมน์ `updated_by` พร้อม `updated_at`
+
+
+## UI Updates (v4)
+- Add Item Modal มีช่อง Updated By ในหน้ากรอกข้อมูล
+- Dropdown (searchable) สำหรับ DosageForm / Major Class / Sub Class ใช้ค่าที่มีอยู่ในระบบ
+- Search จะ filter อัตโนมัติเมื่อพิมพ์ (ไม่ต้องกดปุ่มค้นหา)
