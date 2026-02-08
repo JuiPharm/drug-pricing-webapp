@@ -29,6 +29,7 @@ export function App() {
   const [addOpen, setAddOpen] = useState(false)
   const [factorsOpen, setFactorsOpen] = useState(false)
   const [factorOverrides, setFactorOverrides] = useState<Record<string, FactorOverride>>({})
+  const [priceOverrides, setPriceOverrides] = useState<Record<string, { opd_price?: number; ipd_price?: number }>>({})
   const [summaryOpen, setSummaryOpen] = useState(false)
   const [subSummaryOpen, setSubSummaryOpen] = useState(false)
   const [subRows, setSubRows] = useState<SubclassSummaryRow[]>([])
