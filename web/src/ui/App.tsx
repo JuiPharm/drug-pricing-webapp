@@ -183,6 +183,16 @@ export function App() {
         setOpdTarget={setOpdTarget}
         computed={computed}
         selectedItems={effectiveSelectedItems}
+
+onEditPrice={(code, field, value) => {
+  setPriceOverrides(prev => {
+    const cur = prev[code] || {}
+    if (field === 'opd_price') {
+      return { ...prev, [code]: { ...cur, opd_price: value, ipd_price: value * 1.2 } }
+    }
+    return { ...prev, [code]: { ...cur, ipd_price: value } }
+  })
+}}
       />
     )},
     { key: 'gm', label: 'ตั้งราคาจาก Gross Margin OPD', children: (
@@ -193,6 +203,16 @@ export function App() {
         setGmTarget={setGmTarget}
         computed={computed}
         selectedItems={effectiveSelectedItems}
+
+onEditPrice={(code, field, value) => {
+  setPriceOverrides(prev => {
+    const cur = prev[code] || {}
+    if (field === 'opd_price') {
+      return { ...prev, [code]: { ...cur, opd_price: value, ipd_price: value * 1.2 } }
+    }
+    return { ...prev, [code]: { ...cur, ipd_price: value } }
+  })
+}}
       />
     )},
   ]
@@ -256,9 +276,10 @@ export function App() {
             majorClassOptions={majorClassOptions}
             subClassOptions={subClassOptions}
             onClose={() => setAddOpen(false)}
-            onCreate={async (item) => {
+            onCreate={async (item, updatedByFromModal) => {
               await createItem(item, updatedByFromModal)
               message.success('เพิ่มรายการสำเร็จ')
+              if (!updatedBy.trim()) setUpdatedBy(updatedByFromModal)
               setAddOpen(false)
               await loadAll()
             }}
